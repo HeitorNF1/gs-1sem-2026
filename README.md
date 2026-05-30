@@ -2,7 +2,7 @@
 
 > Plataforma integrada de monitoramento ambiental por satélite para detecção precoce de queimadas e enchentes.
 
-🌐 **[https://gs-1sem.azurewebsites.net](https://gs-1sem.azurewebsites.net)**
+🌐 **[SkyGuard](https://gs-1sem-dqfxbqehdkbgf9ed.brazilsouth-01.azurewebsites.net/)**
 
 ---
 
