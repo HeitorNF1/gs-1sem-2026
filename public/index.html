@@ -3,187 +3,694 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Olá Mundo — Solução Espacial</title>
+  <title>SkyGuard — Monitoramento Ambiental por Satélite</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap');
-
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #020b18;
-      --surface: #071a2e;
-      --accent: #00e5ff;
-      --accent2: #7b61ff;
-      --text: #e8f4f8;
-      --muted: #4a7a94;
+      --bg:       #060d0a;
+      --surface:  #0c1a13;
+      --border:   rgba(52,211,153,0.12);
+      --green:    #34d399;
+      --orange:   #fb923c;
+      --red:      #f87171;
+      --text:     #e2ede8;
+      --muted:    #6b8f7a;
+      --heading:  'Bebas Neue', sans-serif;
+      --body:     'DM Sans', sans-serif;
     }
+
+    html { scroll-behavior: smooth; }
 
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: 'Syne', sans-serif;
+      font-family: var(--body);
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.2rem 4rem;
+      background: rgba(6,13,10,0.8);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family: var(--heading);
+      font-size: 1.8rem;
+      letter-spacing: 0.05em;
+      color: var(--green);
+    }
+    .nav-links { display: flex; gap: 2rem; }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--green); }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
       min-height: 100vh;
       display: flex;
       align-items: center;
-      justify-content: center;
+      padding: 8rem 4rem 4rem;
       overflow: hidden;
     }
 
-    /* Starfield */
-    .stars {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
+    /* Satellite orbit animation */
+    .orbit-bg {
+      position: absolute;
+      right: -10%;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 700px;
+      height: 700px;
+      opacity: 0.07;
       pointer-events: none;
     }
-    .star {
+    .orbit-ring {
       position: absolute;
-      background: white;
       border-radius: 50%;
-      animation: twinkle var(--d) ease-in-out infinite alternate;
+      border: 1px solid var(--green);
     }
-    @keyframes twinkle {
-      from { opacity: 0.1; transform: scale(1); }
-      to   { opacity: 0.9; transform: scale(1.4); }
+    .orbit-ring:nth-child(1) { inset: 0; animation: spin 30s linear infinite; }
+    .orbit-ring:nth-child(2) { inset: 10%; animation: spin 20s linear infinite reverse; }
+    .orbit-ring:nth-child(3) { inset: 25%; animation: spin 14s linear infinite; }
+    .orbit-dot {
+      position: absolute;
+      width: 8px; height: 8px;
+      background: var(--green);
+      border-radius: 50%;
+      top: -4px; left: 50%;
+      transform: translateX(-50%);
+      opacity: 1;
+    }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    .hero-content { position: relative; z-index: 1; max-width: 700px; }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--green);
+      border: 1px solid var(--border);
+      padding: 0.4rem 1rem;
+      border-radius: 100px;
+      margin-bottom: 2rem;
+      animation: fadeUp 0.6s ease both;
+    }
+    .hero-tag span { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 1.5s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    h1 {
+      font-family: var(--heading);
+      font-size: clamp(4rem, 9vw, 7.5rem);
+      line-height: 0.95;
+      letter-spacing: 0.02em;
+      margin-bottom: 1.5rem;
+      animation: fadeUp 0.6s 0.1s ease both;
+    }
+    h1 em {
+      font-style: normal;
+      color: var(--green);
+      -webkit-text-stroke: 0px;
+    }
+    h1 .outline {
+      -webkit-text-stroke: 1px rgba(52,211,153,0.4);
+      color: transparent;
     }
 
-    /* Glow orbs */
-    .orb {
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(80px);
-      opacity: 0.18;
-      z-index: 0;
-      animation: drift 12s ease-in-out infinite alternate;
-    }
-    .orb1 { width: 400px; height: 400px; background: var(--accent2); top: -100px; left: -100px; }
-    .orb2 { width: 350px; height: 350px; background: var(--accent);  bottom: -80px; right: -80px; animation-delay: -6s; }
-    @keyframes drift {
-      from { transform: translate(0, 0); }
-      to   { transform: translate(40px, 30px); }
+    .hero-desc {
+      font-size: 1.1rem;
+      color: var(--muted);
+      max-width: 500px;
+      margin-bottom: 2.5rem;
+      line-height: 1.8;
+      animation: fadeUp 0.6s 0.2s ease both;
     }
 
-    /* Card */
-    .card {
-      position: relative;
-      z-index: 1;
-      text-align: center;
-      padding: 3rem 3.5rem;
-      background: rgba(7, 26, 46, 0.7);
-      border: 1px solid rgba(0, 229, 255, 0.15);
-      border-radius: 20px;
-      backdrop-filter: blur(18px);
-      max-width: 520px;
-      width: 90%;
-      animation: fadeUp 0.8s ease both;
+    .hero-cta {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      animation: fadeUp 0.6s 0.3s ease both;
     }
+    .btn-primary {
+      background: var(--green);
+      color: #060d0a;
+      padding: 0.85rem 2rem;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .btn-primary:hover { opacity: 0.85; transform: translateY(-2px); }
+    .btn-ghost {
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.85rem 2rem;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .btn-ghost:hover { border-color: var(--green); transform: translateY(-2px); }
+
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(30px); }
+      from { opacity: 0; transform: translateY(24px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    .badge {
-      display: inline-block;
-      font-family: 'Space Mono', monospace;
-      font-size: 0.7rem;
-      color: var(--accent);
-      border: 1px solid var(--accent);
-      border-radius: 100px;
-      padding: 0.3rem 0.9rem;
-      margin-bottom: 1.5rem;
-      letter-spacing: 0.12em;
+    /* ── STATS BAR ── */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      margin: 0 4rem;
+    }
+    .stat-item {
+      padding: 2rem;
+      border-right: 1px solid var(--border);
+      animation: fadeUp 0.6s ease both;
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-num {
+      font-family: var(--heading);
+      font-size: 3rem;
+      color: var(--green);
+      line-height: 1;
+      margin-bottom: 0.3rem;
+    }
+    .stat-label { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+
+    /* ── SECTIONS ── */
+    section { padding: 6rem 4rem; position: relative; z-index: 1; }
+
+    .section-tag {
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.15em;
       text-transform: uppercase;
-      animation: fadeUp 0.8s 0.1s ease both;
-    }
-
-    h1 {
-      font-size: clamp(2.2rem, 7vw, 3.4rem);
-      font-weight: 800;
-      line-height: 1.1;
+      color: var(--green);
       margin-bottom: 1rem;
-      animation: fadeUp 0.8s 0.2s ease both;
     }
-    h1 span {
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    p {
-      font-size: 1rem;
-      color: var(--muted);
-      line-height: 1.7;
-      margin-bottom: 2rem;
-      animation: fadeUp 0.8s 0.3s ease both;
+    h2 {
+      font-family: var(--heading);
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      letter-spacing: 0.03em;
+      line-height: 1;
+      margin-bottom: 1.5rem;
     }
 
-    .status {
+    /* ── PROBLEMA ── */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      margin-top: 3rem;
+      align-items: start;
+    }
+    .problem-text p { color: var(--muted); line-height: 1.9; margin-bottom: 1.2rem; }
+    .problem-cards { display: flex; flex-direction: column; gap: 1rem; }
+    .problem-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      transition: border-color 0.2s;
+    }
+    .problem-card:hover { border-color: var(--green); }
+    .problem-card .icon { font-size: 1.8rem; flex-shrink: 0; }
+    .problem-card h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.3rem; }
+    .problem-card p { font-size: 0.85rem; color: var(--muted); }
+
+    /* ── ODS ── */
+    .ods-section { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .ods-grid {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 4rem;
+      align-items: center;
+      margin-top: 3rem;
+    }
+    .ods-badges { display: flex; flex-direction: column; gap: 1rem; }
+    .ods-badge {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.5rem;
+      min-width: 280px;
+    }
+    .ods-num {
+      font-family: var(--heading);
+      font-size: 2.5rem;
+      color: var(--green);
+      line-height: 1;
+      min-width: 3rem;
+    }
+    .ods-info h4 { font-size: 0.9rem; font-weight: 600; }
+    .ods-info p { font-size: 0.8rem; color: var(--muted); }
+    .ods-text p { color: var(--muted); line-height: 1.9; margin-bottom: 1rem; }
+
+    /* ── SOLUÇÃO / DASHBOARD SIMULADO ── */
+    .solution-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+    .sol-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 2rem;
+      transition: border-color 0.25s, transform 0.25s;
+    }
+    .sol-card:hover { border-color: var(--green); transform: translateY(-4px); }
+    .sol-card.wide { grid-column: span 2; }
+    .sol-icon { font-size: 2rem; margin-bottom: 1rem; }
+    .sol-card h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .sol-card p { font-size: 0.875rem; color: var(--muted); line-height: 1.7; }
+
+    /* Simulated dashboard widget */
+    .dashboard-widget {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .widget-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.2rem;
+    }
+    .widget-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+    .widget-live {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.7rem;
+      color: var(--green);
+    }
+    .widget-live span { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 1s infinite; }
+    .alert-list { display: flex; flex-direction: column; gap: 0.6rem; }
+    .alert-item {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.7rem 1rem;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      background: rgba(255,255,255,0.03);
+    }
+    .alert-item.high { border-left: 3px solid var(--red); }
+    .alert-item.med  { border-left: 3px solid var(--orange); }
+    .alert-item.low  { border-left: 3px solid var(--green); }
+    .alert-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .high .alert-dot { background: var(--red); }
+    .med  .alert-dot { background: var(--orange); }
+    .low  .alert-dot { background: var(--green); }
+    .alert-region { font-weight: 500; flex: 1; }
+    .alert-type { color: var(--muted); font-size: 0.75rem; }
+    .alert-time { color: var(--muted); font-size: 0.72rem; margin-left: auto; }
+
+    /* bar chart simulated */
+    .bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 80px; margin-top: 1rem; }
+    .bar {
+      flex: 1;
+      border-radius: 3px 3px 0 0;
+      background: var(--green);
+      opacity: 0.5;
+      animation: growBar 1s ease both;
+      animation-delay: var(--delay);
+    }
+    @keyframes growBar { from { transform: scaleY(0); transform-origin: bottom; } to { transform: scaleY(1); } }
+    .bar.fire { background: var(--orange); }
+    .bar.flood { background: #60a5fa; }
+
+    /* ── EQUIPE ── */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+    .team-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem;
+      text-align: center;
+      transition: border-color 0.2s;
+    }
+    .team-card:hover { border-color: var(--green); }
+    .team-avatar {
+      width: 64px; height: 64px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      margin: 0 auto 1rem;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
-      font-family: 'Space Mono', monospace;
-      font-size: 0.75rem;
-      color: #2ecc71;
-      animation: fadeUp 0.8s 0.4s ease both;
+      font-size: 1.6rem;
     }
-    .dot {
-      width: 8px; height: 8px;
-      background: #2ecc71;
-      border-radius: 50%;
-      animation: pulse 1.4s ease-in-out infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(46,204,113,0.5); }
-      50%       { box-shadow: 0 0 0 6px rgba(46,204,113,0); }
-    }
+    .team-card h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.2rem; }
+    .team-card p { font-size: 0.78rem; color: var(--muted); }
 
-    .divider {
-      width: 48px; height: 2px;
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      border-radius: 2px;
-      margin: 1.5rem auto;
-      animation: fadeUp 0.8s 0.35s ease both;
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 4rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+    .footer-logo { font-family: var(--heading); font-size: 1.4rem; color: var(--green); }
+    footer p { font-size: 0.78rem; color: var(--muted); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { display: none; }
+      .hero { padding: 7rem 1.5rem 3rem; }
+      .stats-bar { grid-template-columns: 1fr; margin: 0 1.5rem; }
+      .stat-item { border-right: none; border-bottom: 1px solid var(--border); }
+      section { padding: 4rem 1.5rem; }
+      .problem-grid, .ods-grid, .solution-grid { grid-template-columns: 1fr; }
+      .sol-card.wide { grid-column: span 1; }
+      .team-grid { grid-template-columns: repeat(2, 1fr); }
+      footer { flex-direction: column; gap: 1rem; text-align: center; padding: 2rem 1.5rem; }
+      .orbit-bg { display: none; }
     }
   </style>
 </head>
 <body>
 
-  <div class="stars" id="stars"></div>
-  <div class="orb orb1"></div>
-  <div class="orb orb2"></div>
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">SkyGuard</div>
+    <div class="nav-links">
+      <a href="#problema">Problema</a>
+      <a href="#ods">ODS</a>
+      <a href="#solucao">Solução</a>
+      <a href="#equipe">Equipe</a>
+    </div>
+  </nav>
 
-  <div class="card">
-    <div class="badge">🚀 Deploy inicial</div>
-    <h1>Olá,<br/><span>Mundo!</span></h1>
-    <div class="divider"></div>
-    <p>
-      Aplicação Node.js rodando no Azure App Service.<br/>
-      Em breve, a solução espacial completa estará aqui.
-    </p>
-    <div class="status">
-      <span class="dot"></span>
-      SERVIDOR ONLINE
+  <!-- HERO -->
+  <section class="hero">
+    <div class="orbit-bg">
+      <div class="orbit-ring"><div class="orbit-dot"></div></div>
+      <div class="orbit-ring"><div class="orbit-dot"></div></div>
+      <div class="orbit-ring"><div class="orbit-dot"></div></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-tag"><span></span> Monitoramento Orbital em Tempo Real</div>
+      <h1>
+        <em>Sky</em><br>
+        <span class="outline">Guard</span>
+      </h1>
+      <p class="hero-desc">
+        Plataforma integrada que usa dados satelitais, imagens orbitais e inteligência climática 
+        para detectar queimadas e enchentes antes que se tornem catástrofes.
+      </p>
+      <div class="hero-cta">
+        <a href="#solucao" class="btn-primary">Ver a Solução</a>
+        <a href="#problema" class="btn-ghost">Entender o Problema</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-num">72%</div>
+      <div class="stat-label">das regiões em risco sem monitoramento adequado</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">4.8M</div>
+      <div class="stat-label">de hectares queimados só em 2023 no Brasil</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">&lt;15min</div>
+      <div class="stat-label">tempo de alerta com dados orbitais em tempo real</div>
     </div>
   </div>
 
-  <script>
-    // Gera estrelas aleatórias
-    const container = document.getElementById('stars');
-    for (let i = 0; i < 120; i++) {
-      const s = document.createElement('div');
-      s.className = 'star';
-      const size = Math.random() * 2 + 0.5;
-      s.style.cssText = `
-        width:${size}px; height:${size}px;
-        top:${Math.random()*100}%;
-        left:${Math.random()*100}%;
-        --d:${2 + Math.random()*4}s;
-        animation-delay:${Math.random()*4}s;
-      `;
-      container.appendChild(s);
-    }
-  </script>
+  <!-- PROBLEMA -->
+  <section id="problema">
+    <div class="section-tag">// O Problema</div>
+    <h2>Desastres que<br>podiam ser evitados</h2>
+    <div class="problem-grid">
+      <div class="problem-text">
+        <p>
+          Eventos extremos como queimadas e enchentes causam prejuízos ambientais, sociais e 
+          econômicos devastadores. Muitas regiões vulneráveis do Brasil não possuem monitoramento 
+          local suficiente, e a resposta costuma ser tardia — quando o dano já está feito.
+        </p>
+        <p>
+          A ausência de sistemas integrados de previsão e alerta deixa comunidades inteiras 
+          desprotegidas. O problema não é a falta de dados: satélites geram terabytes de informação 
+          diariamente. O problema é a falta de uma plataforma que processe e entregue esse conhecimento 
+          de forma acessível e acionável.
+        </p>
+      </div>
+      <div class="problem-cards">
+        <div class="problem-card">
+          <div class="icon">🔥</div>
+          <div>
+            <h4>Queimadas sem detecção precoce</h4>
+            <p>Focos de incêndio identificados apenas quando já se alastram, impossibilitando contenção eficaz.</p>
+          </div>
+        </div>
+        <div class="problem-card">
+          <div class="icon">🌊</div>
+          <div>
+            <h4>Enchentes sem aviso antecipado</h4>
+            <p>Dados hidrológicos e climáticos não integrados resultam em alertas tardios e evacuações de emergência.</p>
+          </div>
+        </div>
+        <div class="problem-card">
+          <div class="icon">📡</div>
+          <div>
+            <h4>Dados satelitais subutilizados</h4>
+            <p>Imagens orbitais disponíveis gratuitamente, mas sem plataforma integrada para análise em tempo real.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ODS -->
+  <section id="ods" class="ods-section">
+    <div class="section-tag">// Conexão com ODS</div>
+    <h2>Alinhado aos Objetivos<br>de Desenvolvimento Sustentável</h2>
+    <div class="ods-grid">
+      <div class="ods-badges">
+        <div class="ods-badge">
+          <div class="ods-num">11</div>
+          <div class="ods-info">
+            <h4>Cidades e Comunidades Sustentáveis</h4>
+            <p>Proteger comunidades vulneráveis de desastres naturais</p>
+          </div>
+        </div>
+        <div class="ods-badge">
+          <div class="ods-num">13</div>
+          <div class="ods-info">
+            <h4>Ação Contra a Mudança Global do Clima</h4>
+            <p>Monitorar e mitigar impactos de eventos climáticos extremos</p>
+          </div>
+        </div>
+        <div class="ods-badge">
+          <div class="ods-num">15</div>
+          <div class="ods-info">
+            <h4>Vida Terrestre</h4>
+            <p>Preservar ecossistemas e combater o desmatamento por queimadas</p>
+          </div>
+        </div>
+      </div>
+      <div class="ods-text">
+        <p>
+          O SkyGuard conecta diretamente à Agenda 2030 da ONU ao endereçar três ODS 
+          fundamentais para a sustentabilidade do planeta. A tecnologia espacial é tratada 
+          como ferramenta de impacto social, não apenas inovação tecnológica.
+        </p>
+        <p>
+          Ao democratizar o acesso a dados orbitais para gestores públicos e comunidades, 
+          a plataforma contribui para cidades mais resilientes (ODS 11), fortalece a capacidade 
+          de resposta às mudanças climáticas (ODS 13) e protege a biodiversidade terrestre 
+          ameaçada pelas queimadas (ODS 15).
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOLUÇÃO -->
+  <section id="solucao">
+    <div class="section-tag">// A Solução</div>
+    <h2>Como o OrbitGuard<br>funciona</h2>
+    <div class="solution-grid">
+      <div class="sol-card">
+        <div class="sol-icon">🛰️</div>
+        <h3>Coleta de Dados Orbitais</h3>
+        <p>Integração com imagens satelitais (INPE, NASA FIRMS) para análise espectral de focos de calor e variação hídrica em tempo real.</p>
+      </div>
+      <div class="sol-card">
+        <div class="sol-icon">🧠</div>
+        <h3>Processamento Inteligente</h3>
+        <p>Algoritmos analisam dados climáticos, hidrológicos e geográficos para calcular índices de risco de queimada e enchente por região.</p>
+      </div>
+      <div class="sol-card">
+        <div class="sol-icon">🔔</div>
+        <h3>Alertas Automatizados</h3>
+        <p>Notificações enviadas automaticamente para autoridades e comunidades quando limiares críticos de risco são atingidos.</p>
+      </div>
+      <div class="sol-card">
+        <div class="sol-icon">📊</div>
+        <h3>Dashboard & API</h3>
+        <p>Interface visual com mapas interativos, séries históricas e API REST para integração com sistemas de defesa civil.</p>
+      </div>
+
+      <!-- DASHBOARD SIMULADO -->
+      <div class="sol-card wide">
+        <div class="sol-icon">📡</div>
+        <h3>Painel de Alertas — Dados Simulados</h3>
+        <p>Visualização do funcionamento da plataforma com dados representativos do monitoramento em tempo real.</p>
+
+        <div class="dashboard-widget">
+          <div class="widget-header">
+            <span class="widget-title">Alertas Ativos — Brasil</span>
+            <span class="widget-live"><span></span> AO VIVO</span>
+          </div>
+          <div class="alert-list">
+            <div class="alert-item high">
+              <div class="alert-dot"></div>
+              <span class="alert-region">Pantanal — MT</span>
+              <span class="alert-type">🔥 Risco extremo de queimada</span>
+              <span class="alert-time">2min atrás</span>
+            </div>
+            <div class="alert-item med">
+              <div class="alert-dot"></div>
+              <span class="alert-region">Vale do Itajaí — SC</span>
+              <span class="alert-type">🌊 Nível hídrico elevado</span>
+              <span class="alert-time">8min atrás</span>
+            </div>
+            <div class="alert-item med">
+              <div class="alert-dot"></div>
+              <span class="alert-region">Sul da Bahia</span>
+              <span class="alert-type">🔥 Foco de incêndio detectado</span>
+              <span class="alert-time">15min atrás</span>
+            </div>
+            <div class="alert-item low">
+              <div class="alert-dot"></div>
+              <span class="alert-region">Região Serrana — RJ</span>
+              <span class="alert-type">🌊 Monitoramento preventivo</span>
+              <span class="alert-time">23min atrás</span>
+            </div>
+          </div>
+
+          <div style="margin-top:1.5rem;">
+            <div class="widget-title" style="margin-bottom:0.5rem;">Eventos Detectados — Últimos 7 dias</div>
+            <div class="bar-chart">
+              <div class="bar fire" style="height:45%;--delay:0s"></div>
+              <div class="bar flood" style="height:30%;--delay:0.05s"></div>
+              <div class="bar fire" style="height:70%;--delay:0.1s"></div>
+              <div class="bar flood" style="height:55%;--delay:0.15s"></div>
+              <div class="bar fire" style="height:90%;--delay:0.2s"></div>
+              <div class="bar flood" style="height:40%;--delay:0.25s"></div>
+              <div class="bar fire" style="height:60%;--delay:0.3s"></div>
+            </div>
+            <div style="display:flex;gap:1.5rem;margin-top:0.8rem;">
+              <span style="font-size:0.72rem;color:var(--muted);display:flex;align-items:center;gap:0.4rem;"><span style="width:10px;height:10px;background:var(--orange);border-radius:2px;display:inline-block"></span>Queimadas</span>
+              <span style="font-size:0.72rem;color:var(--muted);display:flex;align-items:center;gap:0.4rem;"><span style="width:10px;height:10px;background:#60a5fa;border-radius:2px;display:inline-block"></span>Enchentes</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EQUIPE -->
+  <section id="equipe" style="background:var(--surface);border-top:1px solid var(--border);">
+    <div class="section-tag">// A Equipe</div>
+    <h2>Quem está por<br>trás do OrbitGuard</h2>
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="team-avatar">👨‍💻</div>
+        <h4>Heitor Farias</h4>
+        <p>Cloud, DevOps & Desenvolvimento</p>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar">👁️</div>
+        <h4>Guilherme Daher</h4>
+        <p>Visão Computacional</p>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar">🤖</div>
+        <h4>Vinicius Yamashita</h4>
+        <p>RPA</p>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar">📊</div>
+        <h4>Gabriel Freitas</h4>
+        <p>Big Data</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">SkyGuard</div>
+    <p>Global Solution 2026 · FIAP · Turma 1SEM</p>
+    <p style="color:var(--muted)">Monitoramento Ambiental por Satélite</p>
+  </footer>
+
 </body>
 </html>
