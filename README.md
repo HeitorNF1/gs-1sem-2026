@@ -88,6 +88,7 @@ on:
 | Guilherme Daher | Visão Computacional |
 | Vinicius Yamashita | RPA |
 | Gabriel Freitas | Big Data |
+| Lucca Alexandre | IA e ML |
 
 ---
 
